@@ -12,13 +12,56 @@ class View:
         return str(input())
 
     def select_report_menu(self):
-        print('1) Afficher tout les joueurs')
-        print('2) Afficher tout les joueurs d\'un tournoi')
-        print('1) Afficher tout les tournoi')
-        print('1) Afficher les tour d\'un tournoi')
-        print('1) Afficher les tout les matchs d\'un tournoi')
+        print('1) Afficher tout les joueurs par ordre alphabétique')
+        print('2) Afficher tout les joueurs par classement')
+        print('3) Afficher tout les joueurs d\'un tournoi par ordre alphabétique')
+        print('4) Afficher tout les joueurs d\'un tournoi par classement')
+        print('5) Afficher tout les tournois')
+        print('6) Afficher les tour d\'un tournoi')
+        print('7) Afficher les tout les matchs d\'un tournoi')
+        print('0) Retour')
 
         return str(input())
+    
+    def players_list(self, players):
+        print('Joueurs:')
+        for player in players:
+            id = str(player.doc_id)
+            first_name = str(player['first_name'])
+            last_name = str(player['last_name'])
+
+            print(f'{id}) {last_name} {first_name}')
+    
+    def tournaments_list(self, tournaments):
+        print('Tournois:')
+        for tournament in tournaments:
+            id = str(tournament.doc_id)
+            name = str(tournament['name'])
+
+            print(f'{id}) {name}')
+
+    def rounds_list(self, rounds):
+        print('Tours:')
+        for round in rounds:
+            name = str(round['name'])
+
+            print(f'1) {name}')
+    
+    def matches_list(self, rounds):
+        print('Tours:')
+        for round in rounds:
+            name = str(round['name'])
+            matches = round['matches']
+            
+            print(name)
+
+            for match in matches:
+                player_1_id = str(match[0][0])
+                player_1_score = str(match[0][1])
+                player_2_id = str(match[1][0])
+                player_2_score = str(match[1][1])
+
+                print(f'Joueur {player_1_id} VS Joueur {player_2_id}')
 
     def select_time_control(self):
         print('Choisir un contrôle du temps:')

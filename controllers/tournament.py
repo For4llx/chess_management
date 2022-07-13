@@ -1,6 +1,7 @@
 from helpers import get_rank
 from datetime import datetime
 from models.Tournament import Tournament, tournament_database
+from models.Player import player_database
 from models.Round import Round
 
 class TournamentController:
@@ -23,7 +24,6 @@ class TournamentController:
         rounds.append(round.__dict__)
         tournament_database.update({'rounds': rounds}, doc_ids=[tournament_id])
 
-
     def create_tournament_rounds_matches(self, players, round_counter, tournament_id):
         if round_counter == 1:
             matches = []
@@ -43,15 +43,8 @@ class TournamentController:
             matches = []
             players = sorted(players, key=lambda x: (x['points'], x['ranking']))
 
-            # players = [A, B, C, D]
-            # On suppose A et B qui ont déjà joué ensemble
-
             while len(players) != 0:
-                # 1 - first_player = A
-                # 2 - first_player = B
                 first_player = players.pop(0)
-                # 1 - players = [B, C, D]
-                # 2 - players = [D]
                 for player in players:
                     if player.doc_id not in first_player['opponents']:
                         second_player = player
@@ -69,9 +62,20 @@ class TournamentController:
     
     def get_tournament_players(self, tournament_id):
         return tournament_database.get(doc_id=tournament_id)['players']
+    
+    def get_one_tournament_rounds(self, tournament_id):
+        return tournament_database.get(doc_id=tournament_id)['rounds']
 
     def get_one_tournament_match(self, tournament_id, round_index, match_index):
         return tournament_database.get(doc_id=tournament_id)['rounds'][round_index]['matches'][match_index]
+
+    def get_one_tournament_players(self, tournament_id):
+        players = []
+        players_id = tournament_database.get(doc_id=tournament_id)['players']
+        for player_id in players_id:
+            players.append(player_database.get(doc_id=player_id))
+        
+        return players
 
     def update_one_tournament_match_index(self, tournament_id, match_index):
         match_index = tournament_database.get(doc_id=tournament_id)['match_index']
