@@ -6,6 +6,7 @@ from tinydb import TinyDB
 os.makedirs(os.path.dirname('data/player.json'), exist_ok=True)
 player_database = TinyDB('data/player.json')
 
+
 @dataclass
 class Player:
     last_name: str

@@ -1,12 +1,16 @@
 from helpers import get_rank
 from datetime import datetime
+
 from models.Tournament import Tournament, tournament_database
 from models.Player import player_database
 from models.Round import Round
 
+from views.base import View
+
+
 class TournamentController:
-    def __init__(self, view):
-        self.view = view
+    def __init__(self):
+        self.view = View()
 
     def create_tournament(self):
         tournament = self.view.tournament_form()
@@ -124,3 +128,50 @@ class TournamentController:
         round_index = tournament_database.get(doc_id=tournament_id)['round_index']
         round_index = round_index + 1
         tournament_database.update({'round_index': round_index}, doc_ids=[tournament_id])
+
+    def update_score(self, tournament, match):
+        tournament_id = tournament.doc_id
+        players = tournament['players']
+        match_index = tournament['match_index']
+        round_index = tournament['round_index']
+        player_1 = match[0]
+        player_2 = match[1]
+
+        option = self.view.select_score(match)
+
+        if option == '1':
+            match = [[player_1, 1],[player_2, 0]]
+            self.tournament.update_one_tournament_player_score(tournament_id, 0, 1, round_index, match_index)
+            self.player.update_one_tournament_player_point(player_1[0], 1)
+            self.tournament.update_one_tournament_match_index(tournament_id, match_index)
+        elif option == '2':
+            match = [[player_1, 0],[player_2, 1]]
+            self.tournament.update_one_tournament_player_score(tournament_id, 1, 1, round_index, match_index)
+            self.player.update_one_tournament_player_point(player_2[0], 1)
+            self.tournament.update_one_tournament_match_index(tournament_id, match_index)
+        elif option == '3':
+            match = [[player_1, 0.5],[player_2, 0.5]]
+            self.tournament.update_one_tournament_player_score(tournament_id, 0, 0.5, round_index, match_index)
+            self.tournament.update_one_tournament_player_score(tournament_id, 1, 0.5, round_index, match_index)
+            self.player.update_one_tournament_player_point(player_1[0], 0.5)
+            self.player.update_one_tournament_player_point(player_2[0], 0.5)
+            self.tournament.update_one_tournament_match_index(tournament_id, match_index)
+    
+    def random_color(self):
+        colors = ['Black', 'White']
+        color_1 = choice(colors)
+        colors.remove(color_1)
+        color_2 = colors[0]
+        print(color_1)
+        print(color_2)
+
+    def get_time_control(self):
+        option = self.select_time_control()
+        if option == '1':
+            time_control = 'Bullet'
+        elif option == '2':
+            time_control = 'Blitz'
+        elif option == '3':
+            time_control = 'Coup rapide'
+        
+        return time_control

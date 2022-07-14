@@ -7,6 +7,7 @@ from datetime import datetime
 os.makedirs(os.path.dirname('data/tournament.json'), exist_ok=True)
 tournament_database = TinyDB('data/tournament.json')
 
+
 @dataclass
 class Round:
     name: str

@@ -1,11 +1,10 @@
-from controllers.base import Controller
-from views.base import View
+from controllers.menu import MenuController
 
 
 def main():
-    view = View()
-    controller = Controller(view)
-    controller.main_menu(view)
+    menu_controller = MenuController()
+    menu_controller.main_menu()
+
 
 if __name__ == "__main__":
     main()
