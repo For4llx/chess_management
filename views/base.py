@@ -82,7 +82,9 @@ class View:
         name = str(input('Entrer un nom:'))
         place = str(input('Entrer un lieu:'))
         rounds_number = int(input('Entrer un nombre de tours:'))
-        time_control = str(controllers.tournament.TournamentController.get_time_control(self))
+        time_control = str(
+            controllers.tournament.TournamentController.get_time_control(self)
+        )
         description = str(input('Entrer une description:'))
 
         return {

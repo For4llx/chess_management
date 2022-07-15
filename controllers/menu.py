@@ -4,6 +4,7 @@ from views.base import View
 
 from controllers.player import PlayerController
 from controllers.tournament import TournamentController
+from models.Player import player_database
 
 
 class MenuController:
@@ -63,10 +64,10 @@ class MenuController:
                 ranking = self.view.rank_from()
                 self.player.update_one_player_rank(player_id, ranking)
             elif option == '5':
-                self.report_menu(view)
+                self.report_menu()
             elif option == '0':
                 break
-    
+
     def match_menu(self, tournament_id):
         while True:
             tournament = self.tournament.get_one_tournament(tournament_id)
@@ -77,9 +78,8 @@ class MenuController:
             players_id = tournament['players']
             round_counter = round_index + 1
             players = []
-            
+
             if match_index == 4:
-                print('test')
                 self.tournament.update_one_tournament_round_end_time(tournament_id, round_index)
                 self.tournament.update_one_tournament_round_index(tournament_id)
                 self.tournament.reset_one_tournament_match_index(tournament_id)
@@ -87,13 +87,12 @@ class MenuController:
                 round_index = tournament['round_index']
                 match_index = tournament['match_index']
                 round_counter = round_counter + 1
-                print(round_counter)
 
             if round_counter <= tournament_rounds_number:
                 if match_index == 0:
                     for player_id in players_id:
                         players.append(player_database.get(doc_id=player_id))
-                
+
                     matches = self.tournament.create_tournament_rounds_matches(players, round_counter, tournament_id)
                     for match in matches:
                         player_1 = match[0][0]
@@ -103,10 +102,10 @@ class MenuController:
 
                     self.tournament.create_tournament_round(tournament_id, round_counter, matches)
 
-                match = self.tournament.get_one_tournament_match(tournament_id, round_index, match_index)                
+                match = self.tournament.get_one_tournament_match(tournament_id, round_index, match_index)
                 option = self.view.select_match_menu(match)
                 if option == '1':
-                    self.update_score(tournament, match)
+                    self.tournament.update_score(tournament, match)
                 elif option == '0':
                     break
             else:
@@ -147,5 +146,5 @@ class MenuController:
             else:
                 player_id = option
                 player_id = int(player_id)
-            
+
             self.tournament.update_one_tournament_players(tournament_id, player_id)

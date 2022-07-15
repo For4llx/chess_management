@@ -1,7 +1,8 @@
 import os
 
-from dataclasses import dataclass, field
-from datetime import date
+from dataclasses import dataclass
+from dataclasses import field
+from datetime import date as datetimedate
 from tinydb import TinyDB
 
 os.makedirs(os.path.dirname('data/tournament.json'), exist_ok=True)
@@ -15,7 +16,7 @@ class Tournament:
     time_control: str
     description: str
     rounds_number: int = 4
-    date: str = date.today().strftime("%d/%m/%Y")
+    date: str = datetimedate.today().strftime("%d/%m/%Y")
     rounds: list = field(default_factory=list)
     players: list = field(default_factory=list)
     round_index: int = 0

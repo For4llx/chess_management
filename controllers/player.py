@@ -3,6 +3,7 @@ from models.Player import player_database
 
 from views.base import View
 
+
 class PlayerController:
     def __init__(self):
         self.view = View()
@@ -27,13 +28,11 @@ class PlayerController:
         points = points + score
         player_database.update({'points': points}, doc_ids=[player_id])
 
-    def update_one_player_rank(self, player_id, new_ranking):
-        player = player_database.get(doc_id=player_id)
-        ranking = new_ranking
+    def update_one_player_rank(self, player_id, ranking):
         player_database.update({'ranking': ranking}, doc_ids=[player_id])
 
     def get_all_players(self):
         return player_database.all()
-    
+
     def get_one_player(self, player_id):
         return player_database.get(doc_id=player_id)

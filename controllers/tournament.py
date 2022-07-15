@@ -5,12 +5,16 @@ from models.Tournament import Tournament, tournament_database
 from models.Player import player_database
 from models.Round import Round
 
+from controllers.player import PlayerController
+
 from views.base import View
 
 
 class TournamentController:
     def __init__(self):
         self.view = View()
+
+        self.player = PlayerController()
 
     def create_tournament(self):
         tournament = self.view.tournament_form()
@@ -55,7 +59,7 @@ class TournamentController:
                         matches.append([[first_player.doc_id, 0], [second_player.doc_id, 0]])
                         players.remove(player)
                         break
-            
+
             return matches
 
     def get_all_tournaments(self):
@@ -63,10 +67,10 @@ class TournamentController:
 
     def get_one_tournament(self, tournament_id):
         return tournament_database.get(doc_id=tournament_id)
-    
+
     def get_tournament_players(self, tournament_id):
         return tournament_database.get(doc_id=tournament_id)['players']
-    
+
     def get_one_tournament_rounds(self, tournament_id):
         return tournament_database.get(doc_id=tournament_id)['rounds']
 
@@ -78,17 +82,17 @@ class TournamentController:
         players_id = tournament_database.get(doc_id=tournament_id)['players']
         for player_id in players_id:
             players.append(player_database.get(doc_id=player_id))
-        
+
         return players
 
     def update_one_tournament_match_index(self, tournament_id, match_index):
         match_index = tournament_database.get(doc_id=tournament_id)['match_index']
         match_index = match_index + 1
         tournament_database.update({'match_index': match_index}, doc_ids=[tournament_id])
-    
+
     def reset_one_tournament_match_index(self, tournament_id):
         tournament_database.update({'match_index': 0}, doc_ids=[tournament_id])
-    
+
     def update_one_tournament_round_end_time(self, tournament_id, round_index):
         rounds = tournament_database.get(doc_id=tournament_id)['rounds']
         rounds[round_index]['end_time'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -99,21 +103,16 @@ class TournamentController:
         players.append(player_id)
         tournament_database.update({'players': players}, doc_ids=[tournament_id])
 
-    def update_one_tournament_rounds(self, tournament_id, round):
-        rounds = tournament_database.get(doc_id=tournament_id)['rounds']
-        rounds.append(round)
-        tournament_database.update({'rounds': rounds}, doc_ids=[tournament_id])
-  
     def update_one_tournament_current_round(self, tournament_id):
         current_round = tournament_database.get(doc_id=tournament_id)['current_round']
         current_round = current_round + 1
         tournament_database.update({'current_round': current_round}, doc_ids=[tournament_id])
-    
+
     def update_one_tournament_current_matches(self, tournament_id, match):
         current_matches = tournament_database.get(doc_id=tournament_id)['current_matches']
         current_matches.append(match)
         tournament_database.update({'current_matches': current_matches}, doc_ids=[tournament_id])
-      
+
     def update_one_tournament_player_score(self, tournament_id, player, score, round_index, match_index):
         rounds = tournament_database.get(doc_id=tournament_id)['rounds']
         rounds[round_index]['matches'][match_index][player][1] = score
@@ -131,7 +130,6 @@ class TournamentController:
 
     def update_score(self, tournament, match):
         tournament_id = tournament.doc_id
-        players = tournament['players']
         match_index = tournament['match_index']
         round_index = tournament['round_index']
         player_1 = match[0]
@@ -140,30 +138,22 @@ class TournamentController:
         option = self.view.select_score(match)
 
         if option == '1':
-            match = [[player_1, 1],[player_2, 0]]
-            self.tournament.update_one_tournament_player_score(tournament_id, 0, 1, round_index, match_index)
+            match = [[player_1, 1], [player_2, 0]]
+            self.update_one_tournament_player_score(tournament_id, 0, 1, round_index, match_index)
             self.player.update_one_tournament_player_point(player_1[0], 1)
-            self.tournament.update_one_tournament_match_index(tournament_id, match_index)
+            self.update_one_tournament_match_index(tournament_id, match_index)
         elif option == '2':
-            match = [[player_1, 0],[player_2, 1]]
-            self.tournament.update_one_tournament_player_score(tournament_id, 1, 1, round_index, match_index)
+            match = [[player_1, 0], [player_2, 1]]
+            self.update_one_tournament_player_score(tournament_id, 1, 1, round_index, match_index)
             self.player.update_one_tournament_player_point(player_2[0], 1)
-            self.tournament.update_one_tournament_match_index(tournament_id, match_index)
+            self.update_one_tournament_match_index(tournament_id, match_index)
         elif option == '3':
-            match = [[player_1, 0.5],[player_2, 0.5]]
-            self.tournament.update_one_tournament_player_score(tournament_id, 0, 0.5, round_index, match_index)
-            self.tournament.update_one_tournament_player_score(tournament_id, 1, 0.5, round_index, match_index)
+            match = [[player_1, 0.5], [player_2, 0.5]]
+            self.update_one_tournament_player_score(tournament_id, 0, 0.5, round_index, match_index)
+            self.update_one_tournament_player_score(tournament_id, 1, 0.5, round_index, match_index)
             self.player.update_one_tournament_player_point(player_1[0], 0.5)
             self.player.update_one_tournament_player_point(player_2[0], 0.5)
-            self.tournament.update_one_tournament_match_index(tournament_id, match_index)
-    
-    def random_color(self):
-        colors = ['Black', 'White']
-        color_1 = choice(colors)
-        colors.remove(color_1)
-        color_2 = colors[0]
-        print(color_1)
-        print(color_2)
+            self.update_one_tournament_match_index(tournament_id, match_index)
 
     def get_time_control(self):
         option = self.select_time_control()
@@ -173,5 +163,5 @@ class TournamentController:
             time_control = 'Blitz'
         elif option == '3':
             time_control = 'Coup rapide'
-        
+
         return time_control
