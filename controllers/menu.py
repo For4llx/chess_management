@@ -88,30 +88,45 @@ class MenuController:
                 match_index = tournament['match_index']
                 round_counter = round_counter + 1
 
-            if round_counter <= tournament_rounds_number:
-                if match_index == 0:
-                    for player_id in players_id:
-                        players.append(player_database.get(doc_id=player_id))
+                if round_counter <= tournament_rounds_number:
+                    if match_index == 0:
+                        for player_id in players_id:
+                            players.append(player_database.get(doc_id=player_id))
 
-                    matches = self.tournament.create_tournament_rounds_matches(players, round_counter, tournament_id)
-                    for match in matches:
-                        player_1 = match[0][0]
-                        player_2 = match[1][0]
-                        self.player.update_one_player_opponents(player_1, player_2)
-                        self.player.update_one_player_opponents(player_2, player_1)
+                        matches = self.tournament.create_tournament_rounds_matches(
+                            players,
+                            round_counter,
+                            tournament_id)
+                        for match in matches:
+                            player_1 = match[0][0]
+                            player_2 = match[1][0]
+                            self.player.update_one_player_opponents(player_1, player_2)
+                            self.player.update_one_player_opponents(player_2, player_1)
 
-                    self.tournament.create_tournament_round(tournament_id, round_counter, matches)
-
-                match = self.tournament.get_one_tournament_match(tournament_id, round_index, match_index)
-                option = self.view.select_match_menu(match)
-                if option == '1':
-                    self.tournament.update_score(tournament, match)
-                elif option == '0':
+                        self.tournament.create_tournament_round(tournament_id, round_counter, matches)
+                else:
+                    round_index = round_index - 1
+                    self.tournament.update_one_tournament_round_end_time(tournament_id, round_index)
+                    self.tournament.reset_one_tournament_match_index(tournament_id)
                     break
-            else:
-                round_index = round_index - 1
-                self.tournament.update_one_tournament_round_end_time(tournament_id, round_index)
-                self.tournament.reset_one_tournament_match_index(tournament_id)
+            elif match_index == 0:
+                for player_id in players_id:
+                    players.append(player_database.get(doc_id=player_id))
+
+                matches = self.tournament.create_tournament_rounds_matches(players, round_counter, tournament_id)
+                for match in matches:
+                    player_1 = match[0][0]
+                    player_2 = match[1][0]
+                    self.player.update_one_player_opponents(player_1, player_2)
+                    self.player.update_one_player_opponents(player_2, player_1)
+
+                self.tournament.create_tournament_round(tournament_id, round_counter, matches)
+
+            match = self.tournament.get_one_tournament_match(tournament_id, round_index, match_index)
+            option = self.view.select_match_menu(match)
+            if option == '1':
+                self.tournament.update_score(tournament, match)
+            elif option == '0':
                 break
 
     def tournament_menu(self):

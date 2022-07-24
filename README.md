@@ -29,5 +29,5 @@ python3 main.py
 1. Run the following command:
 
 ```
-flake8 --format=html --htmldir=flake8_rapport
+flake8 --format=html --htmldir=flake8_rapport --max-line-length 119
 ```
